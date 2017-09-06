@@ -1,23 +1,21 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: wellington.jorge
- * Date: 8/28/17
- * Time: 3:45 PM
- */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ZBX;
 
 
+use App\Http\Controllers\Controller;
 use App\Hosts;
 use App\VWListHostIP;
 use App\VWListHostsPercent;
 use App\VWListHostsValue;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Mockery\Exception;
 
-class ZBXController {
+class ZBXController extends Controller
+{
+    //
 
     public function ZBCDBConn(){
 
@@ -35,9 +33,9 @@ class ZBXController {
         //$hosts = DB::select('select hostid, host from HOSTS where status in (0,1)');
         $status = array(0,1);
         $hosts = Hosts::select('hostid','host')
-                        ->whereIn('status', $status)
-                        ->where('flags', 0)
-                        ->get();
+            ->whereIn('status', $status)
+            ->where('flags', 0)
+            ->get();
 
         // return $products;
         // Explicito que o formato será em JSON
@@ -79,9 +77,9 @@ class ZBXController {
 
         try{
             $hosts = VWListHostsPercent::where('hostid', 10132)
-                                    ->orderBy('clock', 'desc')
-                                    ->take(10)
-                                    ->get();
+                ->orderBy('clock', 'desc')
+                ->take(10)
+                ->get();
 
             foreach ($hosts as $h){
                 echo "<p>", $h->host;
@@ -179,34 +177,14 @@ class ZBXController {
         }
     }
 
-    public function ZBXGraph($token, $hostids,$graphids){
+    public function ZBXHostStatusCount(){
 
-        try{
-            $url = 'http://zabbix.dataeasy.com.br/api_jsonrpc.php';
-            $post = array(
-                'jsonrpc' => '2.0',
-                'method' => 'graph.get',
-                'params' => array(
-                    "output" => "extend",
-                    "hostids" => $hostids,
-                    "graphids" => $graphids,
-                    "sortfield" => "name"
-                ),
-                'auth' => $token,
-                'id' => 1
-            );
 
-            $data = json_encode($post);
-            $curl = exec("which curl");
-            $curlStr = "$curl -X POST -d '$data' -H 'Content-Type: application/json' '$url'";
-            $execCurl = exec($curlStr);
-            $curlOutput = json_decode($execCurl);
+    }
 
-            return $curlOutput->result;
-
-        } catch (Exception $e) {
-            echo "ERROR: ", $e->getMessage(), "\n";
-        }
+    public function ZBXTestEcho(){
+        $this->ZBXHostStatusCount();
+        echo Config::get('constants.host_inativo');
 
     }
 
@@ -221,17 +199,23 @@ class ZBXController {
 
             $status = Request::input('status','-1');
 
+            echo Config::get('constants.host_inativo');
+
             if ( $status == -1 ) {
                 // All hosts
                 $hosts = VWListHostIP::all();
             } elseif ( $status == -2){
+                // All hosts List Resume
                 $hosts = VWListHostIP::all();
                 return view('zbx.statusresume')->with('hosts', $hosts);
             } elseif ( $status != -1 ) {
-                //Inactive Hosts
-                echo "entrou aqui";
-                echo $status;
+                //Send Status for list
+                // 0 - Inativo
+                // 1 - Ativo e Disponivel
+                // 2 - Ativo e Indisponível
+
                 $hosts = VWListHostIP::where('available', $status)->get();
+                return view('zbx.status')->with('hosts', $hosts);
             } else {
                 return "Status Not Found!!!";
             }
@@ -244,5 +228,4 @@ class ZBXController {
         }
 
     }
-
 }

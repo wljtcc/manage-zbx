@@ -10,43 +10,44 @@
         <div class="row" id="monitoring">
             @foreach($hosts as $h)
                 @if ($h->available == 0)
-                    <div class="col-md-4">
-                        <div class="small-box bg-yellow-active">
-                            <div class="inner">
-                                <h3> {{ $h->host }} </h3>
-                                <p> {{ $h->ip }} </p>
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-yellow-active"><i class="ion ion-flash-off"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-number">{{ $h->host }}</span>
+                                <span class="info-box-text">{{ $h->ip }}</span>
                             </div>
-                            <div class="icon">
-                                <i class="ion ion-flash-off"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> Inativo </a>
+                            <!-- /.info-box-content -->
                         </div>
+                        <!-- /.info-box -->
                     </div>
+                    <!-- /.col -->
                 @elseif($h->available == 1)
-                    <div class="col-md-4">
-                        <div class="small-box bg-green-active">
-                            <div class="inner">
-                                <h3>{{ $h->host }}</h3>
-                                <p> {{ $h->ip }} </p>
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-green-active"><i class="ion ion-ios-pulse-strong"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-number">{{ $h->host }}</span>
+                                <span class="info-box-text">{{ $h->ip }}</span>
                             </div>
-                            <div class="icon">
-                                <i class="ion ion-ios-pulse-strong"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> Online </a>
+                            <!-- /.info-box-content -->
                         </div>
+                        <!-- /.info-box -->
                     </div>
                 @elseif($h->available == 2)
-                    <div class="col-md-4">
-                        <div class="small-box bg-red-active">
-                            <div class="inner">
-                                <h3>{{ $h->host }}</h3>
-                                <p> {{ $h->ip }} </p>
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-red-active"><i class="ion ion-power"></i></span>
+
+                            <div class="info-box info-box-content">
+                                <span class="info-box-number">{{ $h->host }}</span>
+                                <span class="info-box-text">{{ $h->ip }}</span>
                             </div>
-                            <div class="icon">
-                                <i class="ion ion-power"></i>
-                            </div>
-                            <a href="#" class="small-box-footer"> OffLine </a>
+                            <!-- /.info-box-content -->
                         </div>
+                        <!-- /.info-box -->
                     </div>
                 @else
                     <div class="col-md-4">
@@ -71,9 +72,9 @@
 @stop
 
 @section('jscript')
-    var settime = window.setInterval(upload, 5000);
-    function upload()
-    {
-    $('#content').load(". #content");
-    }
+    // Refresh DIV for update stats servers
+    var settime = window.setInterval(reload, 2000);
+    function reload(){
+        $('#content').load(' #content');
+    };
 @stop
